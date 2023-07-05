@@ -9,12 +9,13 @@ import (
 	"github.com/botscubes/bot-service/pkg/logger"
 	a "github.com/botscubes/bot-worker/internal/app"
 	"github.com/botscubes/bot-worker/internal/config"
+	"github.com/botscubes/bot-worker/internal/database/pgsql"
 )
 
 func main() {
 	c, err := config.GetConfig()
 	if err != nil {
-		fmt.Println("Get config: ", err)
+		fmt.Printf("Get config: %v\n", err)
 		return
 	}
 
@@ -22,9 +23,26 @@ func main() {
 		Type: c.LoggerType,
 	})
 	if err != nil {
-		fmt.Println("Create logger: ", err)
+		fmt.Printf("Create logger: %v\n", err)
 		return
 	}
+
+	defer func() {
+		if err := log.Sync(); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	pgsqlUrl := "postgres://" + c.Pg.User + ":" + c.Pg.Pass + "@" + c.Pg.Host + ":" + c.Pg.Port + "/" + c.Pg.Db
+
+	db, err := pgsql.OpenConnection(pgsqlUrl)
+	if err != nil {
+		log.Fatalw("Open PostgreSQL connection", "error", err)
+	}
+
+	defer db.CloseConnection()
+
+	app := a.CreateApp(log, c, db)
 
 	done := make(chan struct{}, 1)
 	sigs := make(chan os.Signal, 1)
@@ -34,10 +52,14 @@ func main() {
 		<-sigs
 		log.Info("Stopping...")
 
+		err = app.Shutdown()
+		if err != nil {
+			log.Fatalw("Shutdown", "error", err)
+		}
+
 		done <- struct{}{}
 	}()
 
-	app := a.CreateApp(log, c)
 	app.Run()
 
 	log.Info("App started")

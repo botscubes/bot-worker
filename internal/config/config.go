@@ -10,6 +10,7 @@ import (
 const (
 	MainComponentId = 1
 	RedisExpire     = 1 * time.Hour
+	ShutdownTimeout = 1 * time.Minute
 )
 
 type ServiceConfig struct {

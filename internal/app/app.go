@@ -10,42 +10,60 @@ import (
 )
 
 type App struct {
-	Log           *zap.SugaredLogger
-	Config        *config.ServiceConfig
-	Redis         *rdb.Rdb
-	Db            *pgsql.Db
-	WebhookServer *bot.WebhookServer
-	Worker        *bot.BotWorker
+	log           *zap.SugaredLogger
+	config        *config.ServiceConfig
+	redis         *rdb.Rdb
+	db            *pgsql.Db
+	webhookServer *bot.WebhookServer
+	worker        *bot.BotWorker
 }
 
-func CreateApp(logger *zap.SugaredLogger, c *config.ServiceConfig) *App {
+func CreateApp(logger *zap.SugaredLogger, c *config.ServiceConfig, db *pgsql.Db) *App {
 	redis := rdb.NewClient(&c.Redis)
+	webhookServer := bot.NewWebhookServer(logger, c)
 
-	pgsqlUrl := "postgres://" + c.Pg.User + ":" + c.Pg.Pass + "@" + c.Pg.Host + ":" + c.Pg.Port + "/" + c.Pg.Db
-	db, err := pgsql.OpenConnection(pgsqlUrl)
-	if err != nil {
-		logger.Fatalw("Open PostgreSQL connection", "error", err)
+	return &App{
+		log:           logger,
+		config:        c,
+		redis:         redis,
+		db:            db,
+		webhookServer: webhookServer,
+		worker:        bot.NewBotWorker(logger, c, redis, db, webhookServer),
 	}
-
-	defer db.CloseConnection()
-
-	app := &App{
-		Log:           logger,
-		Config:        c,
-		Redis:         redis,
-		Db:            db,
-		WebhookServer: bot.NewWebhookServer(logger, c),
-		Worker:        bot.NewBotWorker(logger, c, redis, db),
-	}
-
-	return app
 }
 
 func (app *App) Run() {
-	// TODO: try error
 	go func() {
-		if err := app.WebhookServer.Start(); err != nil {
-			app.Log.Fatalw("Start webhook server", "error", err)
+		if err := app.webhookServer.Start(); err != nil {
+			app.log.Fatalw("Start webhook server", "error", err)
 		}
 	}()
+
+	if err := app.launchBots(); err != nil {
+		app.log.Fatalw("Launch bots", "error", err)
+	}
+}
+
+func (app *App) Shutdown() error {
+	return app.webhookServer.Shutdown()
+}
+
+func (app *App) launchBots() error {
+	bots, err := app.db.GetRunningBots()
+	if err != nil {
+		return err
+	}
+
+	n := 0
+	for _, bot := range *bots {
+		if err := app.worker.RunBot(bot.Id, *bot.Token); err != nil {
+			app.log.Errorw("launch bot", "botId", bot.Id, "error", err)
+		} else {
+			n++
+		}
+	}
+
+	app.log.Infof("Bot launched: %d", n)
+
+	return nil
 }

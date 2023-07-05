@@ -23,12 +23,14 @@ type BotWorker struct {
 	botHandlers   map[int64]*th.BotHandler
 }
 
-func NewBotWorker(logger *zap.SugaredLogger, c *config.ServiceConfig, r *rdb.Rdb, db *pgsql.Db) *BotWorker {
+func NewBotWorker(logger *zap.SugaredLogger, c *config.ServiceConfig, r *rdb.Rdb, db *pgsql.Db, ws *WebhookServer) *BotWorker {
 	return &BotWorker{
-		config: c,
-		log:    logger,
-		redis:  r,
-		db:     db,
+		config:        c,
+		log:           logger,
+		redis:         r,
+		db:            db,
+		webhookServer: ws,
+		botHandlers:   make(map[int64]*th.BotHandler),
 	}
 }
 
@@ -38,14 +40,7 @@ func (bw *BotWorker) RunBot(botId int64, token string) error {
 		return err
 	}
 
-	me, err := bot.GetMe()
-	if err != nil {
-		return err
-	}
-
-	bw.log.Debugf("ME: %v", me)
-
-	bw.log.Info("Starting bot")
+	bw.log.Infof("Starting bot: #%d", botId)
 
 	updates, err := bot.UpdatesViaWebhook(
 		strconv.FormatInt(botId, 10),

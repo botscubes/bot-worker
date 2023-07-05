@@ -29,9 +29,10 @@ func NewWebhookServer(logger *zap.SugaredLogger, c *config.ServiceConfig) *Webho
 	})
 
 	return &WebhookServer{
-		log:    logger,
-		config: c,
-		server: server,
+		log:         logger,
+		config:      c,
+		server:      server,
+		botHandlers: make(map[int64]telego.WebhookHandler),
 	}
 }
 
@@ -72,6 +73,10 @@ func (w *WebhookServer) botHandler(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (w *WebhookServer) Shutdown() error {
+	return w.server.ShutdownWithTimeout(config.ShutdownTimeout)
 }
 
 func errorHandler(log *zap.SugaredLogger) func(ctx *fiber.Ctx, err error) error {
