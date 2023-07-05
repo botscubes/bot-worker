@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - '*.mod'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - '*.mod'
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
+          check-latest: true
+
+      - name: Gofmt check
+        run: diff -u <(echo -n) <(gofmt -d .)
+
+      - name: Golangci Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          skip-pkg-cache: true
+          skip-build-cache: true
