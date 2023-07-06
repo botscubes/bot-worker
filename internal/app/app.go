@@ -4,6 +4,7 @@ import (
 	"github.com/botscubes/bot-worker/internal/bot"
 	"github.com/botscubes/bot-worker/internal/config"
 	"github.com/botscubes/bot-worker/internal/database/pgsql"
+	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"
 
 	rdb "github.com/botscubes/bot-worker/internal/database/redis"
@@ -16,9 +17,10 @@ type App struct {
 	db            *pgsql.Db
 	webhookServer *bot.WebhookServer
 	worker        *bot.BotWorker
+	nc            *nats.Conn
 }
 
-func CreateApp(logger *zap.SugaredLogger, c *config.ServiceConfig, db *pgsql.Db) *App {
+func CreateApp(logger *zap.SugaredLogger, c *config.ServiceConfig, db *pgsql.Db, nc *nats.Conn) *App {
 	redis := rdb.NewClient(&c.Redis)
 	webhookServer := bot.NewWebhookServer(logger, c)
 
@@ -29,6 +31,7 @@ func CreateApp(logger *zap.SugaredLogger, c *config.ServiceConfig, db *pgsql.Db)
 		db:            db,
 		webhookServer: webhookServer,
 		worker:        bot.NewBotWorker(logger, c, redis, db, webhookServer),
+		nc:            nc,
 	}
 }
 
@@ -38,6 +41,14 @@ func (app *App) Run() {
 			app.log.Fatalw("Start webhook server", "error", err)
 		}
 	}()
+
+	if _, err := app.nc.Subscribe("worker.start", app.onStartBot); err != nil {
+		app.log.Fatalw("Nats subscribe: worker.start ", "error", err)
+	}
+
+	if _, err := app.nc.Subscribe("worker.stop", app.onStopBot); err != nil {
+		app.log.Fatalw("Nats subscribe: worker.stop ", "error", err)
+	}
 
 	if err := app.launchBots(); err != nil {
 		app.log.Fatalw("Launch bots", "error", err)
@@ -55,9 +66,9 @@ func (app *App) launchBots() error {
 	}
 
 	n := 0
-	for _, bot := range *bots {
-		if err := app.worker.RunBot(bot.Id, *bot.Token); err != nil {
-			app.log.Errorw("launch bot", "botId", bot.Id, "error", err)
+	for _, b := range *bots {
+		if err := app.worker.RunBot(b.Id, *b.Token); err != nil {
+			app.log.Errorw("launch bot", "botId", b.Id, "error", err)
 		} else {
 			n++
 		}

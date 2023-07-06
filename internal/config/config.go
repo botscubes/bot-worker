@@ -19,6 +19,7 @@ type ServiceConfig struct {
 	ListenAddress string `env:"LISTEN_ADDRESS,required"`
 	Redis         RedisConfig
 	Pg            PostgresConfig
+	NatsURL       string `env:"NATS_URL,required"`
 }
 
 type RedisConfig struct {
