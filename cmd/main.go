@@ -47,7 +47,7 @@ func main() {
 	if err != nil {
 		log.Fatalw("NATS connection", "error", err)
 	}
-	defer nc.Drain()
+	defer nc.Drain() //nolint:errcheck
 
 	app := a.CreateApp(log, c, db, nc)
 

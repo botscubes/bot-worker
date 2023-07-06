@@ -20,15 +20,15 @@ func (app *App) onStartBot(msg *nats.Msg) {
 	if err := json.Unmarshal(msg.Data, req); err != nil {
 		app.log.Error(err)
 
-		msg.Respond([]byte(ncCodeErrServer))
+		msg.Respond([]byte(ncCodeErrServer)) //nolint:errcheck
 		return
 	}
 
 	if err := app.worker.RunBot(req.BotId, req.Token); err != nil {
-		msg.Respond([]byte(ncCodeErrServer))
+		msg.Respond([]byte(ncCodeErrServer)) //nolint:errcheck
 		app.log.Errorw("launch bot", "botId", req.BotId, "error", err)
 	} else {
-		msg.Respond([]byte(ncCodeOk))
+		msg.Respond([]byte(ncCodeOk)) //nolint:errcheck
 	}
 }
 
@@ -37,10 +37,10 @@ func (app *App) onStopBot(msg *nats.Msg) {
 	if err := json.Unmarshal(msg.Data, req); err != nil {
 		app.log.Error(err)
 
-		msg.Respond([]byte(ncCodeErrServer))
+		msg.Respond([]byte(ncCodeErrServer)) //nolint:errcheck
 		return
 	}
 
 	app.worker.StopBot(req.BotId)
-	msg.Respond([]byte(ncCodeOk))
+	msg.Respond([]byte(ncCodeOk)) //nolint:errcheck
 }
