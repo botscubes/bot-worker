@@ -3,6 +3,7 @@ package bot
 import (
 	"errors"
 	"strconv"
+	"sync"
 
 	"github.com/goccy/go-json"
 	"github.com/mymmrac/telego"
@@ -16,6 +17,7 @@ type WebhookServer struct {
 	log         *zap.SugaredLogger
 	config      *config.ServiceConfig
 	server      *fiber.App
+	lock        *sync.Mutex
 	botHandlers map[int64]telego.WebhookHandler
 }
 
@@ -32,6 +34,7 @@ func NewWebhookServer(logger *zap.SugaredLogger, c *config.ServiceConfig) *Webho
 		log:         logger,
 		config:      c,
 		server:      server,
+		lock:        &sync.Mutex{},
 		botHandlers: make(map[int64]telego.WebhookHandler),
 	}
 }
@@ -42,13 +45,16 @@ func (w *WebhookServer) RegisterBot(path string, handler telego.WebhookHandler) 
 		return err
 	}
 
+	w.lock.Lock()
 	w.botHandlers[botID] = handler
-
+	w.lock.Unlock()
 	return nil
 }
 
 func (w *WebhookServer) RemoveBot(botId int64) {
+	w.lock.Lock()
 	delete(w.botHandlers, botId)
+	w.lock.Unlock()
 }
 
 func (w *WebhookServer) Start() error {

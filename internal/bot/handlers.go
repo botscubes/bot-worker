@@ -94,7 +94,6 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 					}
 				}()
 			}
-
 		}
 
 		if err := bw.execMethod(bot, message, component); err != nil {
