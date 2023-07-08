@@ -30,7 +30,7 @@ func main() {
 
 	defer func() {
 		if err := log.Sync(); err != nil {
-			log.Error(err)
+			log.Errorw("failed log sync", "error", err)
 		}
 	}()
 

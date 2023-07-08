@@ -22,19 +22,20 @@ func (bw *BotWorker) registerUser(botId int64) th.Middleware {
 		// check user exist in cache
 		ex, err := bw.redis.CheckUserExist(botId, user.ID)
 		if err != nil {
-			bw.log.Error(err)
+			bw.log.Errorw("failed check user exists in the cache", "error", err)
 		}
 
 		// user not found in cache, check db
 		if ex == 0 {
 			exist, err := bw.db.CheckUserExistByTgId(botId, user.ID)
 			if err != nil {
-				bw.log.Error(err)
+				bw.log.Errorw("failed check user exists in db", "error", err)
 				return
 			}
 
 			if !exist {
 				if err = bw.addUser(botId, user); err != nil {
+					bw.log.Errorw("failed register user", "error", err)
 					return
 				}
 			}

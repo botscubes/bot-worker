@@ -18,29 +18,39 @@ var (
 func (app *App) onStartBot(msg *nats.Msg) {
 	req := new(ncPayload)
 	if err := json.Unmarshal(msg.Data, req); err != nil {
-		app.log.Error(err)
+		app.doNatsRespond(msg, []byte(ncCodeErrServer))
 
-		msg.Respond([]byte(ncCodeErrServer)) //nolint:errcheck
+		app.log.Errorw("failed json unmarshal", "error", err)
 		return
 	}
 
+	// start bot handler
 	if err := app.worker.RunBot(req.BotId, req.Token); err != nil {
-		msg.Respond([]byte(ncCodeErrServer)) //nolint:errcheck
-		app.log.Errorw("launch bot", "botId", req.BotId, "error", err)
+		app.doNatsRespond(msg, []byte(ncCodeErrServer))
+
+		app.log.Errorw("failed launch bot", "botId", req.BotId, "error", err)
 	} else {
-		msg.Respond([]byte(ncCodeOk)) //nolint:errcheck
+		app.doNatsRespond(msg, []byte(ncCodeOk))
 	}
 }
 
 func (app *App) onStopBot(msg *nats.Msg) {
 	req := new(ncPayload)
 	if err := json.Unmarshal(msg.Data, req); err != nil {
-		app.log.Error(err)
+		app.doNatsRespond(msg, []byte(ncCodeErrServer))
 
-		msg.Respond([]byte(ncCodeErrServer)) //nolint:errcheck
+		app.log.Errorw("failed json unmarshal", "error", err)
 		return
 	}
 
+	// stop bot handler
 	app.worker.StopBot(req.BotId)
-	msg.Respond([]byte(ncCodeOk)) //nolint:errcheck
+
+	app.doNatsRespond(msg, []byte(ncCodeOk))
+}
+
+func (app *App) doNatsRespond(msg *nats.Msg, data []byte) {
+	if err := msg.Respond(data); err != nil {
+		app.log.Errorw("failed nats send repond", "error", err)
+	}
 }

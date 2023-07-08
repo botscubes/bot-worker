@@ -59,16 +59,18 @@ func (w *WebhookServer) Start() error {
 func (w *WebhookServer) botHandler(ctx *fiber.Ctx) error {
 	botID, err := strconv.ParseInt(ctx.Params("botID"), 10, 64)
 	if err != nil {
+		w.log.Errorw("failed convert botId to int64", "error", err)
 		return ctx.SendStatus(fiber.StatusBadRequest)
 	}
 
 	handler, ok := w.botHandlers[botID]
 	if !ok {
+		w.log.Warnw("bot handler not found", "botId", botID)
 		return ctx.SendStatus(fiber.StatusNotFound)
 	}
 
 	if err := handler(ctx.Body()); err != nil {
-		w.log.Errorw("webhook bot handler", "bot-id", botID, "error", err)
+		w.log.Errorw("webhook bot handler", "botId", botID, "error", err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -92,6 +94,6 @@ func errorHandler(log *zap.SugaredLogger) func(ctx *fiber.Ctx, err error) error 
 
 		log.Errorf("Bot Worker panic recovered: %v", err)
 
-		return ctx.Status(code).SendString("Error")
+		return ctx.SendStatus(code)
 	}
 }

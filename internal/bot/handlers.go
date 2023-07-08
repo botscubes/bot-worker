@@ -21,27 +21,39 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 		}
 
 		// Get user stepID
-		stepID, err := bw.getUserStep(botId, message.From)
-		if err != nil {
-			return
-		}
-
-		// find next component for execute
-		ok, component, nextStepId := bw.findComponent(botId, stepID, message)
+		stepID, ok := bw.getUserStep(botId, message.From)
 		if !ok {
 			return
 		}
 
+		// find next component for execute
+		component, nextStepId, err := bw.findComponent(botId, stepID, message)
+		if err != nil {
+			bw.log.Errorw("failed find next component for execute", "error", err)
+			return
+		}
+
+		// update stepId
 		if nextStepId != stepID {
 			if err := bw.redis.SetUserStep(botId, message.From.ID, nextStepId); err != nil {
-				bw.log.Error(err)
+				bw.log.Errorw("failed redis set user step", "error", err)
+
+				// upd stepID in db
+				if err := bw.db.SetUserStepByTgId(botId, message.From.ID, stepID); err != nil {
+					bw.log.Errorw("failed update user step by tg id (db)", "error", err)
+				}
+			} else {
+				// Async upd stepID in db
+				go func() {
+					if err := bw.db.SetUserStepByTgId(botId, message.From.ID, stepID); err != nil {
+						bw.log.Errorw("failed update user step by tg id (db)", "error", err)
+					}
+				}()
 			}
-			// Async upd stepID in db
-			go bw.setUserStep(botId, message.From.ID, nextStepId)
 		}
 
 		if err := bw.execMethod(bot, message, component); err != nil {
-			bw.log.Error(err)
+			bw.log.Errorw("message handler: failed exec method", "error", err)
 		}
 	}
 }
@@ -59,27 +71,40 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 		stepID := int64(config.MainComponentId)
 
 		// find next component for execute
-		ok, component, nextStepId := bw.findComponent(botId, stepID, message)
-		if !ok {
+		component, nextStepId, err := bw.findComponent(botId, stepID, message)
+		if err != nil {
+			bw.log.Errorw("failed find next component for execute", "error", err)
 			return
 		}
 
+		// update stepId
 		if nextStepId != stepID {
 			if err := bw.redis.SetUserStep(botId, message.From.ID, nextStepId); err != nil {
-				bw.log.Error(err)
+				bw.log.Errorw("failed redis set user step", "error", err)
+
+				// upd stepID in db
+				if err := bw.db.SetUserStepByTgId(botId, message.From.ID, stepID); err != nil {
+					bw.log.Errorw("failed update user step by tg id (db)", "error", err)
+				}
+			} else {
+				// Async upd stepID in db
+				go func() {
+					if err := bw.db.SetUserStepByTgId(botId, message.From.ID, stepID); err != nil {
+						bw.log.Errorw("failed update user step by tg id (db)", "error", err)
+					}
+				}()
 			}
-			// Async upd stepID in db
-			go bw.setUserStep(botId, message.From.ID, nextStepId)
+
 		}
 
 		if err := bw.execMethod(bot, message, component); err != nil {
-			bw.log.Error(err)
+			bw.log.Errorw("command handler: failed exec method", "error", err)
 		}
 	}
 }
 
 // Determining the next step in the bot structure
-func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Message) (bool, *model.Component, int64) {
+func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Message) (*model.Component, int64, error) {
 	var origComponent *model.Component
 	var component *model.Component
 	origStepID := stepID
@@ -93,14 +118,12 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 		// skip the starting component and undefined components.
 		// Also, the next component is selected here by the id found in the second part of the cycle.
 
+		// check cycle
 		if _, ok := stepsPassed[stepID]; ok {
 			if origStepID == stepID {
 				break
 			}
-
-			// TODO: return errors
-			// bw.log.Warnf("cycle detected: bot #%d", botId)
-			return false, nil, 0
+			return nil, 0, errors.New("cycle detected")
 		}
 
 		stepsPassed[stepID] = struct{}{}
@@ -113,7 +136,7 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 				continue
 			}
 
-			return false, nil, 0
+			return nil, 0, errors.New("failed get component")
 		}
 
 		if origComponent == nil {
@@ -123,9 +146,7 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 		// check main component
 		if component.IsMain {
 			if component.NextStepId == nil || *component.NextStepId == stepID {
-				// TODO: return errors
-				// bw.log.Warnf("error referring to the next component in the main component: bot #%d", botId)
-				return false, nil, 0
+				return nil, 0, errors.New("error referring to the next component in the main component")
 			}
 
 			stepID = *component.NextStepId
@@ -138,7 +159,7 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 			break
 		}
 
-		// In this part, the id of the next component is determined.
+		// In this part there is a search for the ID of the next component.
 		// In case of successful identification of the ID, an additional check occurs in the first part of the cycle.
 
 		isFound = true
@@ -160,7 +181,7 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 		break
 	}
 
-	return true, component, stepID
+	return component, stepID, nil
 }
 
 func (bw *BotWorker) execMethod(bot *telego.Bot, message *telego.Message, component *model.Component) error {
@@ -170,7 +191,7 @@ func (bw *BotWorker) execMethod(bot *telego.Bot, message *telego.Message, compon
 			return err
 		}
 	default:
-		bw.log.Warn("Unknown type method: ", *component.Data.Type)
+		bw.log.Warnw("failed exex method", "Unknown type method: ", *component.Data.Type)
 	}
 
 	return nil

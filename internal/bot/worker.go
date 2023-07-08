@@ -40,7 +40,7 @@ func (bw *BotWorker) RunBot(botId int64, token string) error {
 		return err
 	}
 
-	bw.log.Infof("Starting bot: #%d", botId)
+	bw.log.Infow("Starting bot", "botId", botId)
 
 	updates, err := bot.UpdatesViaWebhook(
 		strconv.FormatInt(botId, 10),
@@ -83,7 +83,12 @@ func (bw *BotWorker) RunBot(botId int64, token string) error {
 }
 
 func (bw *BotWorker) StopBot(botId int64) {
-	// TODO: check exist
-	bw.botHandlers[botId].Stop()
+	bot, ok := bw.botHandlers[botId]
+	if ok {
+		bot.Stop()
+	} else {
+		bw.log.Warnw("bot handler not found", "botId", botId)
+	}
+
 	bw.webhookServer.RemoveBot(botId)
 }
