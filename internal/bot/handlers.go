@@ -52,8 +52,8 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 			}
 		}
 
-		if err := bw.execMethod(bot, message, component); err != nil {
-			bw.log.Errorw("message handler: failed exec method", "error", err)
+		if err := bw.execute(bot, message, component); err != nil {
+			bw.log.Errorw("message handler: failed execute method", "error", err)
 		}
 	}
 }
@@ -96,7 +96,7 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 			}
 		}
 
-		if err := bw.execMethod(bot, message, component); err != nil {
+		if err := bw.execute(bot, message, component); err != nil {
 			bw.log.Errorw("command handler: failed exec method", "error", err)
 		}
 	}
@@ -183,17 +183,13 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 	return component, stepID, nil
 }
 
-func (bw *BotWorker) execMethod(bot *telego.Bot, message *telego.Message, component *model.Component) error {
-	switch *component.Data.Type {
-	case "text":
-		if err := sendMessage(bot, message, component); err != nil {
-			return err
-		}
-	default:
-		bw.log.Warnw("failed exex method", "Unknown type method: ", *component.Data.Type)
+func (bw *BotWorker) execute(bot *telego.Bot, message *telego.Message, component *model.Component) error {
+	action, ok := bw.components[*component.Data.Type]
+	if ok {
+		return action(bot, message, component)
 	}
 
-	return nil
+	return errors.New("Unknown component type")
 }
 
 // Determine commnad by !message text!

@@ -10,6 +10,7 @@ import (
 
 	"github.com/botscubes/bot-worker/internal/config"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"go.uber.org/zap"
 )
 
@@ -58,6 +59,8 @@ func (w *WebhookServer) RemoveBot(botId int64) {
 }
 
 func (w *WebhookServer) Start() error {
+	w.server.Use(recover.New())
+	
 	w.server.Post("/webhook/bot/:botID<int>", w.botHandler)
 	return w.server.Listen(w.config.ListenAddress)
 }

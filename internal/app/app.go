@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/botscubes/bot-worker/internal/bot"
+	ct "github.com/botscubes/bot-worker/internal/components"
 	"github.com/botscubes/bot-worker/internal/config"
 	"github.com/botscubes/bot-worker/internal/database/pgsql"
 	"github.com/nats-io/nats.go"
@@ -36,6 +37,8 @@ func CreateApp(logger *zap.SugaredLogger, c *config.ServiceConfig, db *pgsql.Db,
 }
 
 func (app *App) Run() {
+	app.RegisterComponents()
+
 	go func() {
 		if err := app.webhookServer.Start(); err != nil {
 			app.log.Fatalw("Start webhook server", "error", err)
@@ -77,4 +80,8 @@ func (app *App) launchBots() error {
 	app.log.Infof("Bot launched: %d", n)
 
 	return nil
+}
+
+func (app *App) RegisterComponents() {
+	app.worker.RegisterComponent("text", ct.Text)
 }

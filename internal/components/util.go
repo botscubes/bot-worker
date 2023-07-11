@@ -1,4 +1,4 @@
-package util
+package components
 
 import (
 	"github.com/botscubes/bot-worker/internal/model"
@@ -6,7 +6,8 @@ import (
 	tu "github.com/mymmrac/telego/telegoutil"
 )
 
-func Keyboard(commands *model.Commands, _ *model.Keyboard) *telego.ReplyKeyboardMarkup {
+// keyboard structure formation
+func keyboard(commands *model.Commands, _ *model.Keyboard) *telego.ReplyKeyboardMarkup {
 	// markup (keyboard): unused - for future
 
 	rows := [][]telego.KeyboardButton{}

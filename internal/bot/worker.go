@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 
+	ct "github.com/botscubes/bot-worker/internal/components"
 	"github.com/botscubes/bot-worker/internal/config"
 	"github.com/botscubes/bot-worker/internal/database/pgsql"
 	rdb "github.com/botscubes/bot-worker/internal/database/redis"
@@ -21,6 +22,7 @@ type BotWorker struct {
 	db            *pgsql.Db
 	webhookServer *WebhookServer
 	botHandlers   map[int64]*th.BotHandler
+	components    map[string]ct.Action
 }
 
 func NewBotWorker(logger *zap.SugaredLogger, c *config.ServiceConfig, r *rdb.Rdb, db *pgsql.Db, ws *WebhookServer) *BotWorker {
@@ -31,6 +33,7 @@ func NewBotWorker(logger *zap.SugaredLogger, c *config.ServiceConfig, r *rdb.Rdb
 		db:            db,
 		webhookServer: ws,
 		botHandlers:   make(map[int64]*th.BotHandler),
+		components:    make(map[string]ct.Action),
 	}
 }
 
@@ -91,4 +94,8 @@ func (bw *BotWorker) StopBot(botId int64) {
 	}
 
 	bw.webhookServer.RemoveBot(botId)
+}
+
+func (bw *BotWorker) RegisterComponent(t string, c ct.Action) {
+	bw.components[t] = c
 }
