@@ -28,7 +28,6 @@ func (db *Db) GetRunningBots() (*[]*model.Bot, error) {
 		return nil, err
 	}
 
-	// WARN: status not used
 	for rows.Next() {
 		var r model.Bot
 		if err = rows.Scan(&r.Id, &r.Token); err != nil {

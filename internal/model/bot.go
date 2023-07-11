@@ -8,9 +8,6 @@ var (
 )
 
 type Bot struct {
-	Id     int64     `json:"id"`
-	UserId int64     `json:"userId,omitempty"`
-	Title  *string   `json:"title"`
-	Token  *string   `json:"-"`
-	Status BotStatus `json:"-"`
+	Id    int64   `json:"id"`
+	Token *string `json:"-"`
 }

@@ -21,17 +21,14 @@ func (db *Db) CheckComponentExist(botId int64, compId int64) (bool, error) {
 	return c, nil
 }
 
-func (db *Db) ComponentsForBot(botId int64) (*[]*model.Component, error) {
-	// TODO: REMOVE POSITION !
-	// Change return value to *map[int64]*model.Component???
-
+func (db *Db) Components(botId int64) (*[]*model.Component, error) {
 	var data []*model.Component
 
 	query := `SELECT id, data, keyboard, ARRAY(
 			SELECT jsonb_build_object('id', id, 'data', data, 'type', type, 'componentId', component_id, 'nextStepId', next_step_id)
 				FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.command
 				WHERE component_id = t.id AND status = $1 ORDER BY id
-			), next_step_id, is_main, position, status
+			), next_step_id, is_main
 			FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component t
 			WHERE status = $2 ORDER BY id;`
 
@@ -40,11 +37,10 @@ func (db *Db) ComponentsForBot(botId int64) (*[]*model.Component, error) {
 		return nil, err
 	}
 
-	// WARN: status not used
 	for rows.Next() {
 		var r model.Component
 		r.Commands = &model.Commands{}
-		if err = rows.Scan(&r.Id, &r.Data, &r.Keyboard, r.Commands, &r.NextStepId, &r.IsMain, &r.Position, &r.Status); err != nil {
+		if err = rows.Scan(&r.Id, &r.Data, &r.Keyboard, r.Commands, &r.NextStepId, &r.IsMain); err != nil {
 			return nil, err
 		}
 
@@ -58,25 +54,22 @@ func (db *Db) ComponentsForBot(botId int64) (*[]*model.Component, error) {
 	return &data, nil
 }
 
-func (db *Db) ComponentForBot(botId int64, compID int64) (*model.Component, error) {
-	// TODO: REMOVE POSITION !
-
+func (db *Db) Component(botId int64, compID int64) (*model.Component, error) {
 	prefix := prefixSchema + strconv.FormatInt(botId, 10)
 
 	query := `SELECT id, data, keyboard, ARRAY(
 		SELECT jsonb_build_object('id', id, 'data', data, 'type', type, 'componentId', component_id, 'nextStepId', next_step_id)
 		FROM ` + prefix + `.command
 		WHERE component_id = t.id AND status = $1 ORDER BY id
-	), next_step_id, is_main, position, status
+	), next_step_id, is_main
 	FROM ` + prefix + `.component t
 	WHERE status = $2 AND id = $3 ORDER BY id;`
 
-	// WARN: status not used
 	var r model.Component
 	r.Commands = &model.Commands{}
 	if err := db.Pool.QueryRow(
 		context.Background(), query, model.StatusCommandActive, model.StatusComponentActive, compID,
-	).Scan(&r.Id, &r.Data, &r.Keyboard, r.Commands, &r.NextStepId, &r.IsMain, &r.Position, &r.Status); err != nil {
+	).Scan(&r.Id, &r.Data, &r.Keyboard, r.Commands, &r.NextStepId, &r.IsMain); err != nil {
 		return nil, err
 	}
 

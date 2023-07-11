@@ -87,7 +87,7 @@ func (bw *BotWorker) getComponent(botId int64, stepID int64) (*model.Component, 
 	// components not found in the cache
 	if err == nil && ex == 0 {
 		// get all components from db
-		components, err := bw.db.ComponentsForBot(botId)
+		components, err := bw.db.Components(botId)
 		if err != nil {
 			bw.log.Errorw("failed get all components from db", "error", err)
 		} else {
@@ -116,7 +116,7 @@ func (bw *BotWorker) getComponent(botId int64, stepID int64) (*model.Component, 
 	}
 
 	if exists {
-		component, err = bw.db.ComponentForBot(botId, stepID)
+		component, err = bw.db.Component(botId, stepID)
 		if err != nil {
 			bw.log.Errorw("failed get component from db", "error", err)
 			return nil, err
