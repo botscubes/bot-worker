@@ -26,10 +26,9 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 			return
 		}
 
-		// find next component for execute
-		component, nextStepId, err := bw.findComponent(botId, stepID, message)
-		if err != nil {
-			bw.log.Errorw("failed find next component for execute", "error", err)
+		// find component for execute
+		ok, component, nextStepId := bw.findComponent(botId, stepID, message)
+		if !ok {
 			return
 		}
 
@@ -71,9 +70,8 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 		stepID := int64(config.MainComponentId)
 
 		// find next component for execute
-		component, nextStepId, err := bw.findComponent(botId, stepID, message)
-		if err != nil {
-			bw.log.Errorw("failed find next component for execute", "error", err)
+		ok, component, nextStepId := bw.findComponent(botId, stepID, message)
+		if !ok {
 			return
 		}
 
@@ -103,7 +101,7 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 }
 
 // Determining the next step in the bot structure
-func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Message) (*model.Component, int64, error) {
+func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Message) (bool, *model.Component, int64) {
 	var origComponent *model.Component
 	var component *model.Component
 	origStepID := stepID
@@ -120,13 +118,18 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 		// check cycle
 		if _, ok := stepsPassed[stepID]; ok {
 			if origStepID == stepID {
+				component = origComponent
+				stepID = origStepID
 				break
 			}
-			return nil, 0, errors.New("cycle detected")
+
+			bw.log.Debugw("find component for execute", "message", "cycle detected")
+			return false, nil, 0
 		}
 
 		stepsPassed[stepID] = struct{}{}
 
+		// get component
 		var err error
 		component, err = bw.getComponent(botId, stepID)
 		if err != nil {
@@ -135,7 +138,7 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 				continue
 			}
 
-			return nil, 0, errors.New("failed get component")
+			return false, nil, 0
 		}
 
 		if origComponent == nil {
@@ -145,7 +148,8 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 		// check main component
 		if component.IsMain {
 			if component.NextStepId == nil || *component.NextStepId == stepID {
-				return nil, 0, errors.New("error referring to the next component in the main component")
+				bw.log.Debugw("find component for execute", "message", "error referring to the next component in the main component")
+				return false, nil, 0
 			}
 
 			stepID = *component.NextStepId
@@ -180,7 +184,7 @@ func (bw *BotWorker) findComponent(botId int64, stepID int64, message *telego.Me
 		break
 	}
 
-	return component, stepID, nil
+	return true, component, stepID
 }
 
 func (bw *BotWorker) execute(bot *telego.Bot, message *telego.Message, component *model.Component) error {
@@ -189,7 +193,7 @@ func (bw *BotWorker) execute(bot *telego.Bot, message *telego.Message, component
 		return action(bot, message, component)
 	}
 
-	return errors.New("Unknown component type")
+	return errors.New("unknown component type")
 }
 
 // Determine commnad by !message text!
