@@ -6,7 +6,7 @@ require (
 	github.com/botscubes/bot-service v0.0.0-20230703201324-e8017691aab2
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.47.0
-	github.com/jackc/pgx/v5 v5.4.1
+	github.com/jackc/pgx/v5 v5.4.2
 	github.com/mymmrac/telego v0.25.2-0.20230703055029-bdc6634ccd35
 	github.com/nats-io/nats.go v1.27.1
 	github.com/redis/go-redis/v9 v9.0.5
