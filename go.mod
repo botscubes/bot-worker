@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/botscubes/bot-service v0.0.0-20230703201324-e8017691aab2
 	github.com/goccy/go-json v0.10.2
-	github.com/gofiber/fiber/v2 v2.47.0
+	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/jackc/pgx/v5 v5.4.2
 	github.com/mymmrac/telego v0.25.2-0.20230703055029-bdc6634ccd35
 	github.com/nats-io/nats.go v1.27.1
@@ -31,11 +31,8 @@ require (
 	github.com/nats-io/nats-server/v2 v2.9.19 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
-	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.48.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
