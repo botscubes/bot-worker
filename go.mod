@@ -8,7 +8,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/jackc/pgx/v5 v5.4.2
 	github.com/mymmrac/telego v0.25.2-0.20230703055029-bdc6634ccd35
-	github.com/nats-io/nats.go v1.27.1
+	github.com/nats-io/nats.go v1.28.0
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/sethvargo/go-envconfig v0.9.0
 	go.uber.org/zap v1.24.0
