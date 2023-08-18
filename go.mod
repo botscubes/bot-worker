@@ -9,7 +9,7 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/mymmrac/telego v0.26.0
 	github.com/nats-io/nats.go v1.28.0
-	github.com/redis/go-redis/v9 v9.0.5
+	github.com/redis/go-redis/v9 v9.1.0
 	github.com/sethvargo/go-envconfig v0.9.0
 	go.uber.org/zap v1.25.0
 )
