@@ -7,7 +7,7 @@ require (
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/jackc/pgx/v5 v5.4.3
-	github.com/mymmrac/telego v0.26.0
+	github.com/mymmrac/telego v0.26.1
 	github.com/nats-io/nats.go v1.28.0
 	github.com/redis/go-redis/v9 v9.1.0
 	github.com/sethvargo/go-envconfig v0.9.0
