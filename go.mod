@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17
 	github.com/goccy/go-json v0.10.2
-	github.com/gofiber/fiber/v2 v2.49.1
+	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/mymmrac/telego v0.26.1
 	github.com/nats-io/nats.go v1.28.0
@@ -39,7 +39,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.10.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 )
