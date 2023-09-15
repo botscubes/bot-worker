@@ -11,7 +11,7 @@ require (
 	github.com/nats-io/nats.go v1.29.0
 	github.com/redis/go-redis/v9 v9.1.0
 	github.com/sethvargo/go-envconfig v0.9.0
-	go.uber.org/zap v1.25.0
+	go.uber.org/zap v1.26.0
 )
 
 require (
