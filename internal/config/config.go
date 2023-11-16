@@ -15,7 +15,7 @@ const (
 
 type ServiceConfig struct {
 	LoggerType    string `env:"LOGGER_TYPE,required"`
-	WebhookBase   string `env:"WEBHOOK_BASE,required"`
+	WebhookPath   string `env:"WEBHOOK_PATH,required"`
 	ListenAddress string `env:"LISTEN_ADDRESS,required"`
 	Redis         RedisConfig
 	Pg            PostgresConfig

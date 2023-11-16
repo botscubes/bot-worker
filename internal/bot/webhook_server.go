@@ -61,7 +61,7 @@ func (w *WebhookServer) RemoveBot(botId int64) {
 func (w *WebhookServer) Start() error {
 	w.server.Use(recover.New())
 
-	w.server.Post("/webhook/bot/:botID<int>", w.botHandler)
+	w.server.Post(w.config.WebhookPath+":botID<int>", w.botHandler)
 	return w.server.Listen(w.config.ListenAddress)
 }
 
