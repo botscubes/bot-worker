@@ -43,6 +43,7 @@ linters:
     - dupl # Tool for code clone detection
     - cyclop # checks function and package cyclomatic complexity
     - depguard # Go linter that checks if package imports are in a list of acceptable packages
+    - goconst
 
     # Disabled because of generics
     - rowserrcheck # checks whether Err of rows is checked successfully
