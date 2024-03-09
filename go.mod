@@ -1,6 +1,6 @@
 module github.com/botscubes/bot-worker
 
-go 1.20
+go 1.21.4
 
 require (
 	github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17
