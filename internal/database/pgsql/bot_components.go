@@ -21,37 +21,45 @@ func (db *Db) CheckComponentExist(botId int64, compId int64) (bool, error) {
 	return c, nil
 }
 
-func (db *Db) Components(botId int64) (*[]*model.Component, error) {
-	var data []*model.Component
+func (db *Db) Components(botId int64, groupId int64) (map[int64]*model.ComponentData, error) {
+	query :=
+		`SELECT component_id, type, 
+			jsonb_build_object(
+				'type', type,
+				'path', path,
+				'outputs', outputs,
+				'data', data
+			)
+			FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component
+			WHERE group_id = $1;`
+	var data map[int64]*model.ComponentData = make(map[int64]*model.ComponentData)
+	//
+	// query := `SELECT id, data, keyboard, ARRAY(
+	//
+	//	SELECT jsonb_build_object('id', id, 'data', data, 'type', type, 'componentId', component_id, 'nextStepId', next_step_id)
+	//		FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.command
+	//		WHERE component_id = t.id AND status = $1 ORDER BY id
+	//	), next_step_id, is_main
+	//	FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component t
+	//	WHERE status = $2 ORDER BY id;`
+	//
+	rows, err := db.Pool.Query(context.Background(), query, groupId)
 
-	query := `SELECT id, data, keyboard, ARRAY(
-			SELECT jsonb_build_object('id', id, 'data', data, 'type', type, 'componentId', component_id, 'nextStepId', next_step_id)
-				FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.command
-				WHERE component_id = t.id AND status = $1 ORDER BY id
-			), next_step_id, is_main
-			FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component t
-			WHERE status = $2 ORDER BY id;`
-
-	rows, err := db.Pool.Query(context.Background(), query, model.StatusCommandActive, model.StatusComponentActive)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		var r model.Component
-		r.Commands = &model.Commands{}
-		if err = rows.Scan(&r.Id, &r.Data, &r.Keyboard, r.Commands, &r.NextStepId, &r.IsMain); err != nil {
+		var d model.ComponentData
+		var id int64
+		if err = rows.Scan(&id, &d.Type, &d.Data); err != nil {
 			return nil, err
 		}
 
-		data = append(data, &r)
+		data[id] = &d
 	}
 
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	return &data, nil
+	return data, nil
 }
 
 func (db *Db) Component(botId int64, compID int64) (*model.Component, error) {

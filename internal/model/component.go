@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/botscubes/bot-components/components"
 	"github.com/goccy/go-json"
 )
 
@@ -25,6 +26,15 @@ type Component struct {
 	Commands   *Commands `json:"commands"`
 	NextStepId *int64    `json:"nextStepId"`
 	IsMain     bool      `json:"isMain"`
+}
+
+type ComponentData struct {
+	Type components.ComponentType
+	Data []byte
+}
+
+func (cd *ComponentData) Component() (components.Component, error) {
+	return components.NewComponentFromJSON(cd.Type, cd.Data)
 }
 
 type Commands []*Command

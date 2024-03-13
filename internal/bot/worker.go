@@ -68,10 +68,10 @@ func (bw *BotWorker) RunBot(botId int64, token string) error {
 
 	// Set handlers
 	// Handle command
-	botHandler.Handle(bw.commandHandler(botId),
-		th.Union(
-			th.AnyCommand(),
-		))
+	//	botHandler.Handle(bw.commandHandler(botId),
+	//		th.Union(
+	//			th.AnyCommand(),
+	//		))
 
 	// Handle message
 	botHandler.Handle(bw.messageHandler(botId),
@@ -93,6 +93,7 @@ func (bw *BotWorker) StopBot(botId int64) {
 		bw.log.Warnw("bot handler not found", "botId", botId)
 	}
 
+	bw.log.Infow("stop bot", "botId", botId)
 	bw.webhookServer.RemoveBot(botId)
 }
 
