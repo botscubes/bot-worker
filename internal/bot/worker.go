@@ -18,22 +18,20 @@ const handlerTimeout = 10 // sec
 type BotWorker struct {
 	config        *config.ServiceConfig
 	log           *zap.SugaredLogger
-	redis         *rdb.Rdb
-	db            *pgsql.Db
+	storage       *Storage
 	webhookServer *WebhookServer
 	botHandlers   map[int64]*th.BotHandler
-	components    map[string]ct.Action
+	//components    map[string]ct.Action
 }
 
 func NewBotWorker(logger *zap.SugaredLogger, c *config.ServiceConfig, r *rdb.Rdb, db *pgsql.Db, ws *WebhookServer) *BotWorker {
 	return &BotWorker{
 		config:        c,
 		log:           logger,
-		redis:         r,
-		db:            db,
+		storage:       newStorage(r, db, logger),
 		webhookServer: ws,
 		botHandlers:   make(map[int64]*th.BotHandler),
-		components:    make(map[string]ct.Action),
+		//components:    make(map[string]ct.Action),
 	}
 }
 
@@ -98,5 +96,5 @@ func (bw *BotWorker) StopBot(botId int64) {
 }
 
 func (bw *BotWorker) RegisterComponent(t string, c ct.Action) {
-	bw.components[t] = c
+	//bw.components[t] = c
 }

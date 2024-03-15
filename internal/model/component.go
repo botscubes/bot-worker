@@ -29,8 +29,8 @@ type Component struct {
 }
 
 type ComponentData struct {
-	Type components.ComponentType
-	Data []byte
+	Type components.ComponentType `json:"type"`
+	Data []byte                   `json:"data"`
 }
 
 func (cd *ComponentData) Component() (components.Component, error) {

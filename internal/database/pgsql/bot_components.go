@@ -33,16 +33,7 @@ func (db *Db) Components(botId int64, groupId int64) (map[int64]*model.Component
 			FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component
 			WHERE group_id = $1;`
 	var data map[int64]*model.ComponentData = make(map[int64]*model.ComponentData)
-	//
-	// query := `SELECT id, data, keyboard, ARRAY(
-	//
-	//	SELECT jsonb_build_object('id', id, 'data', data, 'type', type, 'componentId', component_id, 'nextStepId', next_step_id)
-	//		FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.command
-	//		WHERE component_id = t.id AND status = $1 ORDER BY id
-	//	), next_step_id, is_main
-	//	FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component t
-	//	WHERE status = $2 ORDER BY id;`
-	//
+	
 	rows, err := db.Pool.Query(context.Background(), query, groupId)
 
 	if err != nil {

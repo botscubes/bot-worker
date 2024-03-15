@@ -1,11 +1,6 @@
 package bot
 
 import (
-	"errors"
-	"strings"
-
-	//"github.com/botscubes/bot-worker/internal/config"
-	"github.com/botscubes/bot-worker/internal/model"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -22,7 +17,7 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 				update.Message.Text,
 			),
 		)
-		components, err := bw.db.Components(botId, 1)
+		components, err := bw.storage.components(botId, 1)
 		if err != nil {
 			bw.log.Info(err)
 		} else {
@@ -163,34 +158,34 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 //
 //	return true, component, stepID
 //}
-
-func (bw *BotWorker) execute(bot *telego.Bot, message *telego.Message, component *model.Component) error {
-	action, ok := bw.components[*component.Data.Type]
-	if ok {
-		return action(bot, message, component)
-	}
-
-	return errors.New("unknown component type")
-}
-
-// Determine commnad by !message text!
-func findComponentCommand(mes *string, commands *model.Commands) *model.Command {
-	// work with command type - text
-	for _, command := range *commands {
-		// The comparison is not case sensitive
-		if strings.EqualFold(*command.Data, *mes) {
-			return command
-		}
-	}
-
-	return nil
-}
-
-func commandEqual(messageText string, command string) bool {
-	matches := th.CommandRegexp.FindStringSubmatch(messageText)
-	if len(matches) != th.CommandMatchGroupsLen {
-		return false
-	}
-
-	return strings.EqualFold(matches[1], command)
-}
+//
+//func (bw *BotWorker) execute(bot *telego.Bot, message *telego.Message, component *model.Component) error {
+//	action, ok := bw.components[*component.Data.Type]
+//	if ok {
+//		return action(bot, message, component)
+//	}
+//
+//	return errors.New("unknown component type")
+//}
+//
+//// Determine commnad by !message text!
+//func findComponentCommand(mes *string, commands *model.Commands) *model.Command {
+//	// work with command type - text
+//	for _, command := range *commands {
+//		// The comparison is not case sensitive
+//		if strings.EqualFold(*command.Data, *mes) {
+//			return command
+//		}
+//	}
+//
+//	return nil
+//}
+//
+//func commandEqual(messageText string, command string) bool {
+//	matches := th.CommandRegexp.FindStringSubmatch(messageText)
+//	if len(matches) != th.CommandMatchGroupsLen {
+//		return false
+//	}
+//
+//	return strings.EqualFold(matches[1], command)
+//}
