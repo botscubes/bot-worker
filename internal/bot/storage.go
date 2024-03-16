@@ -72,7 +72,7 @@ func (s *Storage) setUserStep() {
 
 }
 
-func (s *Storage) addUser(botId int64, groupId int64, from *telego.User) error {
+func (s *Storage) addUser(botId int64, from *telego.User) error {
 	user := &model.User{
 		TgId:      from.ID,
 		FirstName: &from.FirstName,
@@ -89,9 +89,30 @@ func (s *Storage) addUser(botId int64, groupId int64, from *telego.User) error {
 		return err
 	}
 
-	if err := s.redis.SetUserStep(botId, groupId, from.ID, user.StepId); err != nil {
+	if err := s.redis.SetUserStep(botId, config.MainGroupId, from.ID, user.StepId); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Storage) checkUserExist(userId int64, botId int64) (bool, error) {
+	ex, err := s.redis.CheckUserExist(botId, userId)
+	if err != nil {
+		return false, err
+	}
+
+	if ex == 0 {
+
+		exist, err := s.db.CheckUserExistByTgId(botId, userId)
+		if err != nil {
+			return false, err
+		}
+		s.log.Debugw("get user existence from db", "user", userId)
+		return exist, nil
+
+	}
+
+	s.log.Debugw("get user existence from redis", "user", userId)
+	return true, nil
 }

@@ -12,11 +12,11 @@ import (
 func (rdb *Rdb) SetUserStep(botId int64, groupId int64, userID int64, stepID int64) error {
 	ctx := context.Background()
 
-	key := "bot" + strconv.FormatInt(botId, 10) +
-		":group:" + strconv.FormatInt(groupId, 10) +
-		":user:" + strconv.FormatInt(userID, 10)
+	key := "user:" + strconv.FormatInt(userID, 10) +
+		":bot:" + strconv.FormatInt(botId, 10)
 
-	if err := rdb.HSet(ctx, key, "step", stepID).Err(); err != nil {
+	field := "group:" + strconv.FormatInt(groupId, 10) + ":step"
+	if err := rdb.HSet(ctx, key, field, stepID).Err(); err != nil {
 		return err
 	}
 
@@ -26,12 +26,13 @@ func (rdb *Rdb) SetUserStep(botId int64, groupId int64, userID int64, stepID int
 func (rdb *Rdb) GetUserStep(botId int64, groupId int64, userID int64) (*int64, error) {
 	ctx := context.Background()
 
-	key := "bot" + strconv.FormatInt(botId, 10) +
-		":group:" + strconv.FormatInt(groupId, 10) +
-		":user:" + strconv.FormatInt(userID, 10)
+	key := "user:" + strconv.FormatInt(userID, 10) +
+		":bot:" + strconv.FormatInt(botId, 10)
+
+	field := "group:" + strconv.FormatInt(groupId, 10) + ":step"
 
 	var stepID int64
-	err := rdb.HGet(ctx, key, "step").Scan(&stepID)
+	err := rdb.HGet(ctx, key, field).Scan(&stepID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil, nil
@@ -44,6 +45,7 @@ func (rdb *Rdb) GetUserStep(botId int64, groupId int64, userID int64) (*int64, e
 
 func (rdb *Rdb) CheckUserExist(botId int64, userID int64) (int64, error) {
 	ctx := context.Background()
-	key := "bot" + strconv.FormatInt(botId, 10) + ":user:" + strconv.FormatInt(userID, 10)
+	key := "user:" + strconv.FormatInt(userID, 10) +
+		":bot:" + strconv.FormatInt(botId, 10)
 	return rdb.Exists(ctx, key).Result()
 }
