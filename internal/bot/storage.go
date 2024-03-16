@@ -96,7 +96,7 @@ func (s *Storage) addUser(botId int64, from *telego.User) error {
 	return nil
 }
 
-func (s *Storage) checkUserExist(userId int64, botId int64) (bool, error) {
+func (s *Storage) checkUserExist(botId int64, userId int64) (bool, error) {
 	ex, err := s.redis.CheckUserExist(botId, userId)
 	if err != nil {
 		return false, err

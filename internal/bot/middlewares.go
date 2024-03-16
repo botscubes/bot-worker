@@ -19,8 +19,7 @@ func (bw *BotWorker) registerUser(botId int64) th.Middleware {
 			user = &update.CallbackQuery.From
 		}
 
-		// check user exist in cache
-		ex, err := bw.storage.checkUserExist(user.ID, botId)
+		ex, err := bw.storage.checkUserExist(botId, user.ID)
 		if err != nil {
 			bw.log.Errorw("failed check user exists", "error", err)
 		}
