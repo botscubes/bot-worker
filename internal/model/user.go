@@ -1,6 +1,9 @@
 package model
 
-import "github.com/goccy/go-json"
+import (
+	"github.com/botscubes/bot-components/context"
+	"github.com/goccy/go-json"
+)
 
 type UserStatus int
 
@@ -15,7 +18,8 @@ type User struct {
 	LastName  *string `json:"lastName"`
 	Username  *string `json:"username"`
 	StepID
-	Status UserStatus `json:"-"`
+	Context *context.Context `json:"context"`
+	Status  UserStatus       `json:"-"`
 }
 
 type StepID struct {

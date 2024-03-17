@@ -128,6 +128,9 @@ func (s *Storage) setUserStep(botId int64, groupId int64, userId int64, stepId i
 }
 
 func (s *Storage) addUser(botId int64, from *telego.User) error {
+
+	ctx := context.NewContext()
+
 	user := &model.User{
 		TgId:      from.ID,
 		FirstName: &from.FirstName,
@@ -136,7 +139,8 @@ func (s *Storage) addUser(botId int64, from *telego.User) error {
 		StepID: model.StepID{
 			StepId: config.MainComponentId,
 		},
-		Status: model.StatusUserActive,
+		Context: ctx,
+		Status:  model.StatusUserActive,
 	}
 
 	_, err := s.db.AddUser(botId, user)

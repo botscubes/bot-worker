@@ -24,6 +24,7 @@ func (bw *BotWorker) registerUser(botId int64) th.Middleware {
 			bw.log.Errorw("failed check user exists", "error", err)
 		}
 		if !ex {
+			bw.log.Debugw("register user", "botId,", botId, "user", user.ID)
 			if err = bw.storage.addUser(botId, user); err != nil {
 				bw.log.Errorw("failed register user", "error", err)
 				return

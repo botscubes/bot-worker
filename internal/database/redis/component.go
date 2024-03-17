@@ -25,7 +25,7 @@ import (
 
 func (rdb *Rdb) SetComponents(botId int64, groupId int64, comps map[int64]*model.ComponentData) error {
 	ctx := context.Background()
-	key := "bot" + strconv.FormatInt(botId, 10) + ":group" + strconv.FormatInt(groupId, 10)
+	key := "bot:" + strconv.FormatInt(botId, 10) + ":group" + strconv.FormatInt(groupId, 10)
 	data, err := json.Marshal(comps)
 	if err != nil {
 		return nil
@@ -39,7 +39,7 @@ func (rdb *Rdb) SetComponents(botId int64, groupId int64, comps map[int64]*model
 func (rdb *Rdb) GetComponents(botId int64, groupId int64) (*map[int64]*model.ComponentData, error) {
 	ctx := context.Background()
 
-	key := "bot" + strconv.FormatInt(botId, 10) + ":group" + strconv.FormatInt(groupId, 10)
+	key := "bot:" + strconv.FormatInt(botId, 10) + ":group" + strconv.FormatInt(groupId, 10)
 
 	components := new(map[int64]*model.ComponentData)
 
