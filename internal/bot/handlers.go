@@ -40,12 +40,26 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 			return
 		}
 		e := exec.NewExecutor(ctx, NewBotIO(bot, &update))
+
 		for {
-			component, ok := components[step]
+			componentData, ok := components[step]
 			if !ok {
 				break
 			}
-			step := e.Execute()
+			component, err := componentData.Component()
+			if err != nil {
+				bw.log.Errorw("failed get component", "error", err)
+			}
+			st, err := e.Execute(component)
+			if err != nil {
+				var val any = err.Error()
+				ctx.SetValue("error", &val)
+			}
+			if st == nil {
+				break
+			}
+			step = *st
+
 		}
 	}
 }
