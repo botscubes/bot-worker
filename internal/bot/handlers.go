@@ -1,31 +1,52 @@
 package bot
 
 import (
+	"github.com/botscubes/bot-components/exec"
+	"github.com/botscubes/bot-worker/internal/config"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
-	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 // Handles incoming Message & EditedMessage from Telegram.
 func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 	return func(bot *telego.Bot, update telego.Update) {
-		bw.log.Info("Test message")
-		chatID := update.Message.Chat.ID
-		bot.SendMessage(
-			tu.Message(
-				tu.ID(chatID),
-				update.Message.Text,
-			),
-		)
-		components, err := bw.storage.components(botId, 1)
+		bw.log.Infow("handle user action", "botId", botId, "user", update.Message.From)
+		//	chatID := update.Message.Chat.ID
+		//	bot.SendMessage(
+		//		tu.Message(
+		//			tu.ID(chatID),
+		//			update.Message.Text,
+		//		),
+		//	)
+		var groupId int64 = config.MainGroupId
+		components, err := bw.storage.components(botId, groupId)
 		if err != nil {
-			bw.log.Info(err)
-		} else {
-			for key, value := range components {
-				bw.log.Info(key, string(value.Data))
-			}
+			bw.log.Errorw("failed get components", "error", err)
+			return
 		}
-
+		userId := update.Message.From.ID
+		ctx, err := bw.storage.context(botId, groupId, userId)
+		if err != nil {
+			bw.log.Errorw("failed get context", "error", err)
+			return
+		}
+		step, err := bw.storage.userStep(botId, groupId, userId)
+		if err != nil {
+			bw.log.Errorw("failed get user step", "error", err)
+			return
+		}
+		if step == 0 {
+			bw.log.Info("")
+			return
+		}
+		e := exec.NewExecutor(ctx, NewBotIO(bot, &update))
+		for {
+			component, ok := components[step]
+			if !ok {
+				break
+			}
+			step := e.Execute()
+		}
 	}
 }
 
