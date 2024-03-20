@@ -66,10 +66,10 @@ func (bw *BotWorker) RunBot(botId int64, token string) error {
 
 	// Set handlers
 	// Handle command
-	//	botHandler.Handle(bw.commandHandler(botId),
-	//		th.Union(
-	//			th.AnyCommand(),
-	//		))
+	botHandler.Handle(bw.commandHandler(botId),
+		th.Union(
+			th.AnyCommand(),
+		))
 
 	// Handle message
 	botHandler.Handle(bw.messageHandler(botId),

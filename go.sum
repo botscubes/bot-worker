@@ -1,9 +1,9 @@
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
-github.com/botscubes/bot-components v0.0.0-20240316081623-363ea9dcea44 h1:3P+YgWMyfwOs5SeaJBONoZ5GM2YPr0R7GDtqV2zctbw=
-github.com/botscubes/bot-components v0.0.0-20240316081623-363ea9dcea44/go.mod h1:q6VJNNk6rhw6/NwXuXB3eDxidDhV6LGeZUfhU9XeFHQ=
-github.com/botscubes/bot-components v0.0.0-20240317145157-ee75fdd8c85b h1:IaEf+Gtmfn8+uoKZ8XzcgcnwfeYARU1EPM0/0dol5bk=
-github.com/botscubes/bot-components v0.0.0-20240317145157-ee75fdd8c85b/go.mod h1:q6VJNNk6rhw6/NwXuXB3eDxidDhV6LGeZUfhU9XeFHQ=
+github.com/botscubes/bot-components v0.0.0-20240320133625-42236da8f444 h1:RWawX58I0nahYBZBGeFjTo3p8xKmSK+Rf1R50RQAEaw=
+github.com/botscubes/bot-components v0.0.0-20240320133625-42236da8f444/go.mod h1:q6VJNNk6rhw6/NwXuXB3eDxidDhV6LGeZUfhU9XeFHQ=
+github.com/botscubes/bot-components v0.0.0-20240320143739-074189c24a90 h1:KFTxkw2Ws230zlhwJLzTFMpv7mfFeinRrDwULFJtE4U=
+github.com/botscubes/bot-components v0.0.0-20240320143739-074189c24a90/go.mod h1:q6VJNNk6rhw6/NwXuXB3eDxidDhV6LGeZUfhU9XeFHQ=
 github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17 h1:EYExt5zZjUWUY0ZDo3kBSnuOWP+wgQScXDlwltOGF9Q=
 github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17/go.mod h1:rkGkCe9qmtaiW9imuUmBGIE4SgOvSJlJtoA3Kk4XZGQ=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
