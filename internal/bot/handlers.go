@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/botscubes/bot-components/context"
-	"github.com/botscubes/bot-components/exec"
 	"github.com/botscubes/bot-worker/internal/config"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
@@ -21,52 +20,27 @@ func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 		//			update.Message.Text,
 		//		),
 		//	)
-		var groupId int64 = config.MainGroupId
-		components, err := bw.storage.components(botId, groupId)
-		if err != nil {
-			bw.log.Errorw("failed get components", "error", err)
-			return
-		}
+
 		userId := update.Message.From.ID
+		var groupId int64 = config.MainGroupId
 		ctx, err := bw.storage.context(botId, groupId, userId)
 		if err != nil {
-			bw.log.Errorw("failed get context", "error", err)
-			return
+
 		}
 		step, err := bw.storage.userStep(botId, groupId, userId)
 		if err != nil {
-			bw.log.Errorw("failed get user step", "error", err)
-			return
+
 		}
 		if step == 0 {
-			bw.log.Info("")
+			bw.log.Infow("no following components", "botId", botId, "user", update.Message.From)
 			return
 		}
-		e := exec.NewExecutor(ctx, NewBotIO(bot, &update))
-
-		for {
-			componentData, ok := components[step]
-			if !ok {
-				break
-			}
-			bw.log.Info(string(componentData.Data))
-			component, err := componentData.Component()
-			if err != nil {
-				bw.log.Errorw("failed get component", "error", err)
-
-				break
-			}
-			st, err := e.Execute(component)
-			if err != nil {
-				var val any = err.Error()
-				ctx.SetValue("error", &val)
-			}
-			if st == nil {
-				break
-			}
-			step = *st
-
+		io := NewBotIO(bot, &update, false)
+		err = bw.execute(botId, groupId, userId, io, step, ctx)
+		if err != nil {
+			bw.log.Errorw("failed execute", "error", err)
 		}
+
 	}
 }
 
@@ -84,8 +58,16 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 		stepId := int64(config.MainComponentId)
 		groupId := int64(config.MainGroupId)
 		userId := update.Message.From.ID
-		bw.storage.setUserStep(botId, groupId, userId, stepId)
-		bw.storage.redis.SetUserContext(botId, groupId, userId, context.NewContext())
+		//bw.storage.setUserStep(botId, groupId, userId, stepId)
+		//bw.storage.redis.SetUserContext(botId, groupId, userId, context.NewContext())
+
+		io := NewBotIO(bot, &update, false)
+		err := bw.execute(botId, groupId, userId, io, stepId, context.NewContext())
+		if err != nil {
+			bw.log.Errorw("failed execute", "error", err)
+		}
+		//bw.storage.setUserStep(botId, groupId, userId, stepId)
+		//bw.storage.redis.SetUserContext(botId, groupId, userId, context.NewContext())
 
 	}
 }

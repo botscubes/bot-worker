@@ -7,14 +7,16 @@ import (
 )
 
 type BotIO struct {
-	bot    *telego.Bot
-	update *telego.Update
+	bot              *telego.Bot
+	update           *telego.Update
+	messageProcessed bool
 }
 
-func NewBotIO(bot *telego.Bot, update *telego.Update) *BotIO {
+func NewBotIO(bot *telego.Bot, update *telego.Update, messageProcessed bool) *BotIO {
 	return &BotIO{
 		bot,
 		update,
+		messageProcessed,
 	}
 }
 
@@ -28,6 +30,10 @@ func (io *BotIO) OutputText(text string) {
 	)
 }
 func (io *BotIO) InputText() *string {
-
-	return nil
+	if io.messageProcessed {
+		return nil
+	}
+	text := io.update.Message.Text
+	io.messageProcessed = true
+	return &text
 }

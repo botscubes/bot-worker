@@ -25,6 +25,7 @@ func (db *Db) Components(botId int64, groupId int64) (map[int64]*model.Component
 	query :=
 		`SELECT component_id, type, 
 			jsonb_build_object(
+				'id', component_id,
 				'type', type,
 				'path', path,
 				'outputs', outputs,
@@ -33,7 +34,7 @@ func (db *Db) Components(botId int64, groupId int64) (map[int64]*model.Component
 			FROM ` + prefixSchema + strconv.FormatInt(botId, 10) + `.component
 			WHERE group_id = $1;`
 	var data map[int64]*model.ComponentData = make(map[int64]*model.ComponentData)
-	
+
 	rows, err := db.Pool.Query(context.Background(), query, groupId)
 
 	if err != nil {
