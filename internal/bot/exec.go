@@ -18,7 +18,7 @@ func (bw *BotWorker) execute(botId int64, groupId int64, userId int64, io io.IO,
 		if !ok {
 			break
 		}
-		bw.log.Info(string(componentData.Data))
+		bw.log.Debug(string(componentData.Data))
 		component, err := componentData.Component()
 		if err != nil {
 			return err

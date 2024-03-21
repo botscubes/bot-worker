@@ -61,7 +61,7 @@ func (bw *BotWorker) commandHandler(botId int64) th.Handler {
 		//bw.storage.setUserStep(botId, groupId, userId, stepId)
 		//bw.storage.redis.SetUserContext(botId, groupId, userId, context.NewContext())
 
-		io := NewBotIO(bot, &update, false)
+		io := NewBotIO(bot, &update, true)
 		err := bw.execute(botId, groupId, userId, io, stepId, context.NewContext())
 		if err != nil {
 			bw.log.Errorw("failed execute", "error", err)
