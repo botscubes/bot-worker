@@ -36,6 +36,15 @@ func (rdb *Rdb) SetComponents(botId int64, groupId int64, comps map[int64]*model
 	return rdb.Expire(ctx, key, config.RedisExpire).Err()
 }
 
+func (rdb *Rdb) DeleteComponents(botId int64, groupId int64) error {
+	ctx := context.Background()
+	key := "bot:" + strconv.FormatInt(botId, 10) + ":group" + strconv.FormatInt(groupId, 10)
+	if err := rdb.Del(ctx, key).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (rdb *Rdb) GetComponents(botId int64, groupId int64) (*map[int64]*model.ComponentData, error) {
 	ctx := context.Background()
 

@@ -52,6 +52,10 @@ func (s *Storage) components(botId int64, groupId int64) (map[int64]*model.Compo
 
 }
 
+func (s *Storage) clearComponentCache(botId int64) error {
+	return s.redis.DeleteComponents(botId, s.groupId())
+}
+
 func (s *Storage) groupId() int64 {
 	return config.MainGroupId
 }

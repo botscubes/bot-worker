@@ -41,7 +41,12 @@ func (bw *BotWorker) RunBot(botId int64, token string) error {
 		return err
 	}
 
-	bw.log.Infow("Starting bot", "botId", botId)
+	bw.log.Infow("starting bot", "botId", botId)
+
+	if err := bw.storage.clearComponentCache(botId); err != nil {
+		return err
+	}
+	bw.log.Infow("clear component cache", "botId", botId)
 
 	updates, err := bot.UpdatesViaWebhook(
 		strconv.FormatInt(botId, 10),
