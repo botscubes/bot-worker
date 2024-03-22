@@ -1,9 +1,12 @@
 package bot
 
 import (
+	"errors"
+
 	"github.com/botscubes/bot-components/context"
 	"github.com/botscubes/bot-components/exec"
 	"github.com/botscubes/bot-components/io"
+	"github.com/botscubes/bot-worker/internal/config"
 )
 
 func (bw *BotWorker) execute(botId int64, groupId int64, userId int64, io io.IO, step int64, ctx *context.Context) error {
@@ -11,13 +14,26 @@ func (bw *BotWorker) execute(botId int64, groupId int64, userId int64, io io.IO,
 	if err != nil {
 		return err
 	}
-
+	const MAX_VISIT = config.MaxLoopInExecution
+	visitedComponents := make(map[int64]int64)
 	e := exec.NewExecutor(ctx, io)
 	for {
+		_, ok := visitedComponents[step]
+		if ok {
+			visitedComponents[step]++
+		} else {
+			visitedComponents[step] = 1
+		}
+		if visitedComponents[step] > MAX_VISIT {
+
+			return errors.New("Loop too long")
+		}
+
 		componentData, ok := components[step]
 		if !ok {
 			break
 		}
+
 		bw.log.Debug(string(componentData.Data))
 		component, err := componentData.Component()
 		if err != nil {
@@ -35,6 +51,7 @@ func (bw *BotWorker) execute(botId int64, groupId int64, userId int64, io io.IO,
 		if step == *st {
 			break
 		}
+
 		step = *st
 	}
 

@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	MainComponentId = 1
-	MainGroupId     = 1
-	RedisExpire     = 1 * time.Hour
-	ShutdownTimeout = 1 * time.Minute
+	MainComponentId    = 1
+	MainGroupId        = 1
+	RedisExpire        = 1 * time.Hour
+	ShutdownTimeout    = 1 * time.Minute
+	MaxLoopInExecution = 10
 )
 
 type ServiceConfig struct {
