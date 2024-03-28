@@ -13,13 +13,6 @@ import (
 func (bw *BotWorker) messageHandler(botId int64) th.Handler {
 	return func(bot *telego.Bot, update telego.Update) {
 		bw.log.Infow("handle user action", "botId", botId, "user", update.Message.From)
-		//	chatID := update.Message.Chat.ID
-		//	bot.SendMessage(
-		//		tu.Message(
-		//			tu.ID(chatID),
-		//			update.Message.Text,
-		//		),
-		//	)
 
 		userId := update.Message.From.ID
 		var groupId int64 = config.MainGroupId
