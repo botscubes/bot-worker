@@ -17,7 +17,9 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/botscubes/bql v0.0.0-20240530165240-e5c43a472ae5 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fasthttp/router v1.4.20 // indirect
 	github.com/google/uuid v1.3.1 // indirect
