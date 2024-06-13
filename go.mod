@@ -3,7 +3,7 @@ module github.com/botscubes/bot-worker
 go 1.22
 
 require (
-	github.com/botscubes/bot-components v0.0.0-20240328182414-3284831f1812
+	github.com/botscubes/bot-components v0.0.0-20240612151137-409c50931289
 	github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.49.2
