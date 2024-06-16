@@ -8,6 +8,8 @@ github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17 h1:EYExt5zZj
 github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17/go.mod h1:rkGkCe9qmtaiW9imuUmBGIE4SgOvSJlJtoA3Kk4XZGQ=
 github.com/botscubes/bot-service v0.0.0-20240614160201-51eabb13a09a h1:+VdpR4UjsV7Y1LnlCtKLLeoin3BjbTb4cwnQQ0oX5ow=
 github.com/botscubes/bot-service v0.0.0-20240614160201-51eabb13a09a/go.mod h1:ugzJ8A6BiQAROe861TanV0TvlZA0LLvXKCSTI8BLVV0=
+github.com/botscubes/bot-service v0.0.0-20240616214916-9665b480adda h1:rujEpwJCmoJ0DPsFejoISwkiMGmBi8IvBC2hVgbapSA=
+github.com/botscubes/bot-service v0.0.0-20240616214916-9665b480adda/go.mod h1:OfJw193Ne3ntz08DccLQMCK6e6/eynOpgSsjCbsPcJU=
 github.com/botscubes/bql v0.0.0-20240530165240-e5c43a472ae5 h1:/x2GBd1O2YkKjUW3sD5CbrWSu+TquuwN8uNKVUT3PGk=
 github.com/botscubes/bql v0.0.0-20240530165240-e5c43a472ae5/go.mod h1:DgMsFnqIeKNWoXM9e8chHtxb+tlNKlK2YtQLzI72V+Q=
 github.com/botscubes/bql v0.0.0-20240616210931-32c3a72e156c/go.mod h1:DgMsFnqIeKNWoXM9e8chHtxb+tlNKlK2YtQLzI72V+Q=
