@@ -3,21 +3,21 @@ module github.com/botscubes/bot-worker
 go 1.22
 
 require (
-	github.com/botscubes/bot-components v0.0.0-20240614091455-6c46ec182125
-	github.com/botscubes/bot-service v0.0.0-20230803185718-3e541d237a17
+	github.com/botscubes/bot-components v0.0.0-20240616212315-9b4843c046b5
+	github.com/botscubes/bot-service v0.0.0-20240614160201-51eabb13a09a
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/mymmrac/telego v0.26.3
-	github.com/nats-io/nats.go v1.30.0
+	github.com/nats-io/nats.go v1.30.1
 	github.com/redis/go-redis/v9 v9.2.0
-	github.com/sethvargo/go-envconfig v0.9.0
+	github.com/sethvargo/go-envconfig v1.0.0
 	go.uber.org/zap v1.26.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/botscubes/bql v0.0.0-20240530165240-e5c43a472ae5 // indirect
+	github.com/botscubes/bql v0.0.0-20240616210931-32c3a72e156c // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -40,9 +40,9 @@ require (
 	github.com/valyala/fasthttp v1.50.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.10.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 )
