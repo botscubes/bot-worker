@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"bytes"
+
 	"github.com/botscubes/bot-components/io"
 	"github.com/mymmrac/telego"
 
@@ -37,6 +39,20 @@ func (io *BotIO) ReadText() *string {
 	text := io.update.Message.Text
 	io.messageProcessed = true
 	return &text
+}
+
+func (io *BotIO) PrintPhoto(file []byte, name string) error {
+	chatID := io.update.Message.Chat.ID
+	_, err := io.bot.SendPhoto(
+		tu.Photo(tu.ID(chatID), tu.File(
+			tu.NameReader(
+				bytes.NewReader(file),
+				name,
+			),
+		),
+		),
+	)
+	return err
 }
 
 func (io *BotIO) PrintButtons(text string, buttons []*io.ButtonData) {
