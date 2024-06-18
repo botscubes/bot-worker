@@ -23,14 +23,15 @@ func NewBotIO(bot *telego.Bot, update *telego.Update, messageProcessed bool) *Bo
 	}
 }
 
-func (io *BotIO) PrintText(text string) {
+func (io *BotIO) PrintText(text string) error {
 	chatID := io.update.Message.Chat.ID
-	io.bot.SendMessage(
+	_, err := io.bot.SendMessage(
 		tu.Message(
 			tu.ID(chatID),
 			text,
 		).WithReplyMarkup(tu.ReplyKeyboardRemove()),
 	)
+	return err
 }
 func (io *BotIO) ReadText() *string {
 	if io.messageProcessed {
@@ -55,12 +56,12 @@ func (io *BotIO) PrintPhoto(file []byte, name string) error {
 	return err
 }
 
-func (io *BotIO) PrintButtons(text string, buttons []*io.ButtonData) {
+func (io *BotIO) PrintButtons(text string, buttons []*io.ButtonData) error {
 
 	chatID := io.update.Message.Chat.ID
 	if len(buttons) == 0 {
-		io.PrintText(text)
-		return
+		err := io.PrintText(text)
+		return err
 	}
 	tbuttons := make([][]telego.KeyboardButton, (len(buttons)-1)/3+1)
 
@@ -77,5 +78,6 @@ func (io *BotIO) PrintButtons(text string, buttons []*io.ButtonData) {
 		text,
 	).WithReplyMarkup(keyboard)
 
-	io.bot.SendMessage(msg)
+	_, err := io.bot.SendMessage(msg)
+	return err
 }
